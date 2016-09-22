@@ -1,0 +1,15 @@
+{
+  "name": "zip-image-viewer",
+  "version": "0.0.1",
+  "description": "Simple website that natively show images inside a compressed zip file",
+  "keywords": [
+    "zip",
+    "viewer",
+    "picture"
+  ],
+  "author": "sedano.me",
+  "license": "MIT",
+  "dependencies": {
+    "jszip": "^3.1.2"
+  }
+}

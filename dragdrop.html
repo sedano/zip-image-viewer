@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en"> 
+<head>
+    <meta charset="UTF-8">
+    <title>Zip Image viewer</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+        
+        div {
+            width: 350px;
+            height: 200px;
+            background-color: green;
+            margin: 3px;
+            text-align: center;
+            color: white;
+        }
+
+        input, p {
+            margin:10px 0 10px 3px;
+        }
+        
+        #output {
+            background-color: white;
+        }
+
+        #output > img {
+            max-width: 300px;
+        }
+        
+        .new-image {
+            max-width: 200px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Zip Image Viewer</h1>
+    <input type="file" id="input" onchange="handleFiles(this.files)" accept="application/x-zip-compressed">
+    <div id="dropbox">Drag zip file with images below</div>
+    <p>Images will appear here</p>
+    <div id="output"></div>
+
+</body>
+<!--JSZip Copyright (c) 2009-2016 Stuart Knightley, David Duponchel, Franz Buchinger, António Afonso
+Download from https://stuk.github.io/jszip/-->
+<script src="jszip.js"></script>
+
+<script>
+    
+    var zip = new JSZip();
+
+    var output = document.getElementById("output");
+    var dropbox = document.getElementById("dropbox");
+/* Drag and drop events, prevent browser default */
+    dropbox.addEventListener("dragenter", dragenter, false);
+    dropbox.addEventListener("dragover", dragover, false);
+    dropbox.addEventListener("drop", drop, false);
+
+    function dragenter(e) {
+        e.stopPropagation();
+        e.preventDefault();
+    }
+
+    function dragover(e) {
+        e.stopPropagation();
+        e.preventDefault();
+    }
+
+    function drop(e) {
+        e.stopPropagation();
+        e.preventDefault();
+
+        var files = e.dataTransfer.files;
+
+        handleFiles(files);
+    }
+
+/* Check if file is zip and call unzip */
+    function handleFiles(files){
+        var file = files[0]; //In case of multiple files only use the first one
+            console.log(file);
+            if (file.type == "application/x-zip-compressed"){
+                unzip(file);
+            } else {
+                alert("The file is not a zip, please try again")
+            }
+        }
+
+/* Async unzip of file, callback unzipImage */
+        function unzip(file){
+            zip.loadAsync(file).then(unzipImage);
+        }
+
+/* For each compressed image in the zip create image blob */
+        function unzipImage(image){
+            image.forEach(function(relativePath, zipEntry){
+                //TODO: Check if file is an image
+                console.log(zipEntry);
+                zipEntry.async("base64").then(appendImage)
+            })
+        }
+
+/* Add blob image to the dom */
+        function appendImage(content){
+            var img = document.createElement("img");
+            img.classList.add("new-image");
+            img.src = 'data:image;base64,' + content;
+            output.appendChild(img);
+        }
+
+</script>
+
+</html>
